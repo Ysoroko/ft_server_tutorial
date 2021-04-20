@@ -12,9 +12,9 @@ You will often need to test your work. The following commands are used *A LOT* a
 `docker build -t ft_server .` will **_🛠️ build_** our Docker container and name it "ft_server". 
 
 `docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will  **_🏃‍♂️ run_** our container and:
-  * `-it` open its terminal and allow us to execute commands directly inside (this flag is useful to manually check the contents of the container)
-  * `--rm` automatically remove it once it's stopped
-  * `-p` link the necessary ports (80 and 443)
+  * `-it` open its terminal and allow us to execute commands directly inside (it is useful to manually check the contents of the container)
+  * `--rm` automatically remove the container once it's stopped
+  * `-p` link the necessary ports between the container and our computer (80 and 443)
   * And finally, name it "ft_server"
  
 `docker rmi $(docker images -q)` will remove all the images
