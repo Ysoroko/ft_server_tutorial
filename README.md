@@ -1,4 +1,4 @@
-### This is a complete step-by-step guide to complete ft_server project (s42 coding schools network)
+### This is a complete step-by-step tutorial to validate ft_server project (s42 coding schools network)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Prerequisites:
