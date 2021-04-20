@@ -6,12 +6,12 @@
 
 # Project parts summary:
 #### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
-#### 2) Install all of the dependencies needed for the rest of the project
-#### 3) Install and configure NGINX
-#### 4) Install and configure phpMyAdmin
-#### 5) Install and configure Wordpress
-#### 6) Generate SSL certificate and key
-#### 7) Autoindex and wrapping up
+#### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
+#### 3) [Install and configure NGINX](#install-and-configure-nginx)
+#### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
+#### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
+#### 6) [Generate SSL certificate and key](#generate-ssl-certifiacte-and-key)
+#### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
 <br />
 
 # Building, running and cleaning up your containers:
@@ -62,7 +62,7 @@ Now if we try to build our docker image and run it, Debian Buster image will be 
 
 <br />
 
-# 2) Install all of the dependancies needed to install the rest of the tools
+# Install all of the dependancies
 Now that we have our Dockerfile and an empty Debian OS with basic packages, we will install the dependencies and tools needed for further steps in the project.
 
 This is done by adding several `apt-get install` to our Dockerfile. For this project there is a couple of things we need:
@@ -88,7 +88,7 @@ RUN apt-get -y install php-zip php-net-socket php-gd php-xml-util php-gettext ph
 ```
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster and also downloads all of the dependencies we need.
 
-# 3) Configure NGINX
+# Install and configure NGINX
 In the previous part of the project we have downloaded nginx using `RUN apt-get -y install nginx`.
 
 Now, we will configure it to connect our container to our webpage.
@@ -150,7 +150,7 @@ server {
  
  Now that our configuration is ready, we will need to add some lines to our Dockerfile to copy it inside the container and set it up:
  ```Dockerfile
-#----------------------------------- 3. CONFIGURE NGINX  -----------------------------------------
+#----------------------------------- 3. Install and cofigure Nginx  ------------------------------
 # NGINX will need a folder where it will search for everything related to our website
 RUN mkdir /var/www/localhost
 
