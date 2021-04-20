@@ -28,7 +28,7 @@
 #### `docker system prune` will cleanup the temporary files and the rest of remaining used space
 <br />
 
-# 1) Create a Dockerfile and download a Debian Buster image
+# Create a Dockerfile and download a Debian Buster image
 All you need to do is:
 * Create a file called Dockerfile
 * Add a line `FROM debian:buster` inside.
