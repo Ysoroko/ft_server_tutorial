@@ -2,7 +2,7 @@
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Prerequisites:
-### - 📚 You know all the concepts and tools needed for this project: containers, images, ports etc.
+### - 📚 You know all the concepts needed for this project: containers, images, ports etc.
 ### - 🐳 You have Docker installed and it is running ([**download link**](https://www.docker.com/get-started))
 
 --------------------------------------------------------------------------------------------------------------------------------------
