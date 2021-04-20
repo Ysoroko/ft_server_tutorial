@@ -1,9 +1,11 @@
 ### This is a complete step-by-step guide to complete ft_server project for 42 coding schools network.
+
+--------------------------------------------------------------------------------------------------------------------------------------
 # Prerequisites:
 ### - 📚 You know all the concepts and tools needed for this project: containers, images, ports etc.
 ### - 🐳 You have Docker installed and it is running ([**download link**](https://www.docker.com/get-started))
-<br />
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Project parts summary:
 #### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
 #### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
@@ -12,27 +14,27 @@
 #### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
 #### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
 #### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
-<br />
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Building, running and cleaning up your containers:
 You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier ([example](./Makefile))
 
 `docker build -t ft_server .` will **🛠️ build** our Docker container and name it "ft_server". 
 
-`docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will:
-  * `run` **🏃‍♂️ run** our container
-  * `-it` in the terminal mode (we will be able to execute the commands inside the image from our terminal)
+`docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will  **🏃‍♂️ run** our container and:
+  * `-it` open its terminal and allow us to execute commands directly inside (this flag is useful to try to manually check the contents of the container)
   * `--rm` automatically remove it once it's stopped
   * `-p` link the necessary ports (80 and 443)
   * And finally, name it "ft_server"
-  * 
+ 
 `docker rmi $(docker images -q)` will remove all the images
 
 `docker rm $(docker ps -qa)` will remove all the containers
 
 `docker system prune` will cleanup the temporary files and the rest of remaining used space
-<br />
 
+
+--------------------------------------------------------------------------------------------------------------------------------------
 # Error checking
 #### In case you complete this tutorial and you get any errors, you can find final versions of each file in this repository to compare them with yours.
 #### Please avoid simply copy/pasting everything as there are a lot of handy new concepts you need to understand and use in a later project "ft_services".
@@ -42,8 +44,8 @@ You will often need to test your work. The following commands are used *A LOT* a
 * [config.inc.php](./srcs/config.inc.php)
 * [wp-config.php](./srcs/wp-config.php)
 * (Optional but helpful: [Makefile](./Makefile))
-<br />
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Create a Dockerfile and download a Debian Buster image
 All you need to do is:
 * Create a file named Dockerfile
@@ -76,8 +78,8 @@ RUN apt-get upgrade -y
 ```
 Now if we try to build our docker image and run it, Debian Buster image will be downloaded from Docker and it will be updated.
 
-<br />
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Install all of the dependencies
 Now that we have our Dockerfile and an empty Debian OS with basic packages, we will install the dependencies and tools needed for further steps in the project.
 
@@ -186,8 +188,8 @@ WORKDIR /var/www/localhost/
 ```
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
 and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
-<br />
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Install and configure phpMyAdmin
 In step 2 we have installed mariadb-server. Now we will configure it and set up phpMyAdmin to use it.
 
@@ -413,6 +415,7 @@ RUN chmod -R 755 /var/www/*
 ```
 That's it! Now we have our debian buster image, all the dependencies we need, NGINX, phpMyAdmin and Wordpress configued. The only thing left to do is setup the SSL protocol and the project is ready!
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Generate SSL certificate and key
 In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key. Now we will create those by adding a simple (but a very long) line in our [Dockerfile](./Dockerfile):
 ```Dockerfile
@@ -447,6 +450,7 @@ You can see that the website is using our certificate and key by clicking "Not S
 
 Another sign that we are using ssl is that we are using "https://" and not "http://" to reach the webpage.
 
+--------------------------------------------------------------------------------------------------------------------------------------
 # Autoindex and wrapping up
 
 #### Autoindex
@@ -479,6 +483,7 @@ Afterwards, you can login into phpMyAdmin by using "root" username and an empty 
 While in phpMyAdmin you will be able to check out the Wordpress database and the changes like newly created users/posts etc. 
 
 If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpress" section is going to be empty.
+
 ![](srcs/images/phpMyAdmin_login.png)
 
 ![](srcs/images/phpMyAdmin.png)
