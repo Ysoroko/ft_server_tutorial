@@ -6,22 +6,12 @@
 ### - 🐳 You have Docker installed and it is running ([**download link**](https://www.docker.com/get-started))
 
 --------------------------------------------------------------------------------------------------------------------------------------
-# Project parts summary:
-#### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
-#### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
-#### 3) [Install and configure NGINX](#install-and-configure-nginx)
-#### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
-#### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
-#### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
-#### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
-
---------------------------------------------------------------------------------------------------------------------------------------
 # Building, running and cleaning up your containers:
 You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier ([example](./Makefile))
 
-`docker build -t ft_server .` will **🛠️ build** our Docker container and name it "ft_server". 
+`docker build -t ft_server .` will **_🛠️ build_** our Docker container and name it "ft_server". 
 
-`docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will  **🏃‍♂️ run** our container and:
+`docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will  **_🏃‍♂️ run_** our container and:
   * `-it` open its terminal and allow us to execute commands directly inside (this flag is useful to try to manually check the contents of the container)
   * `--rm` automatically remove it once it's stopped
   * `-p` link the necessary ports (80 and 443)
@@ -32,18 +22,15 @@ You will often need to test your work. The following commands are used *A LOT* a
 `docker rm $(docker ps -qa)` will remove all the containers
 
 `docker system prune` will cleanup the temporary files and the rest of remaining used space
-
-
 --------------------------------------------------------------------------------------------------------------------------------------
-# Error checking
-#### In case you complete this tutorial and you get any errors, you can find final versions of each file in this repository to compare them with yours.
-#### Please avoid simply copy/pasting everything as there are a lot of handy new concepts you need to understand and use in a later project "ft_services".
-* [Dockerfile](./Dockerfile)
-* [localhost](./srcs/localhost)
-* [start.sh](./srcs/start.sh)
-* [config.inc.php](./srcs/config.inc.php)
-* [wp-config.php](./srcs/wp-config.php)
-* (Optional but helpful: [Makefile](./Makefile))
+# Project parts summary:
+#### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
+#### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
+#### 3) [Install and configure NGINX](#install-and-configure-nginx)
+#### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
+#### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
+#### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
+#### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Create a Dockerfile and download a Debian Buster image
@@ -490,3 +477,15 @@ If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpr
 
 You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables in "wordpress" -> "wp-users" section to make sure the link between the two is working properly.
 
+--------------------------------------------------------------------------------------------------------------------------------------
+# Error checking
+#### In case you complete this tutorial and you get any errors, you can find final versions of each file in this repository to compare them with yours.
+#### Please avoid simply copy/pasting everything as there are a lot of handy new concepts you need to understand and use in a later project "ft_services".
+* [Dockerfile](./Dockerfile)
+* [localhost](./srcs/localhost)
+* [start.sh](./srcs/start.sh)
+* [config.inc.php](./srcs/config.inc.php)
+* [wp-config.php](./srcs/wp-config.php)
+* (Optional but helpful: [Makefile](./Makefile))
+
+--------------------------------------------------------------------------------------------------------------------------------------
