@@ -10,7 +10,7 @@
 #### 3) [Install and configure NGINX](#install-and-configure-nginx)
 #### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
 #### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
-#### 6) [Generate SSL certificate and key](#generate-ssl-certifiacte-and-key)
+#### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
 #### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
 <br />
 
