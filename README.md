@@ -15,17 +15,22 @@
 <br />
 
 # Building, running and cleaning up your containers:
-#### You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier ([example](./Makefile))
-#### `docker build -t ft_server .` will build our Docker container and name it "ft_server"
-#### `docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will:
-  * `run` *run* our container
+You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier ([example](./Makefile))
+
+`docker build -t ft_server .` will **🛠️ build** our Docker container and name it "ft_server". 
+
+`docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will:
+  * `run` **🏃‍♂️ run** our container
   * `-it` in the terminal mode (we will be able to execute the commands inside the image from our terminal)
   * `--rm` automatically remove it once it's stopped
   * `-p` link the necessary ports (80 and 443)
   * And finally, name it "ft_server"
-#### `docker rmi $(docker images -q)` will remove all the images
-#### `docker rm $(docker ps -qa)` will remove all the containers
-#### `docker system prune` will cleanup the temporary files and the rest of remaining used space
+  * 
+`docker rmi $(docker images -q)` will remove all the images
+
+`docker rm $(docker ps -qa)` will remove all the containers
+
+`docker system prune` will cleanup the temporary files and the rest of remaining used space
 <br />
 
 # Error checking
