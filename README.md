@@ -172,7 +172,7 @@ Now if we try to build our docker image and run it, it downloads/updates Debian 
 and also copies our NGINX configuration file inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
 <br />
 
-# 4) Install and configure phpMyAdmin
+# Install and configure phpMyAdmin
 In step 2 we have installed mariadb-server. Now we will configure it and set up phpMyAdmin to use it.
 
 [**Here (step 2)**](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10) you can see how to install, launch and setup mariadb databases by running several commands inside Debian Buster terminal. 
@@ -397,7 +397,7 @@ RUN chmod -R 755 /var/www/*
 ```
 That's it! Now we have our debian buster image, all the dependencies we need, NGINX, phpMyAdmin and Wordpress configued. The only thing left to do is setup the SSL protocol and the project is ready!
 
-# 6) Generate SSL certificate and key
+# Generate SSL certificate and key
 In step 3 we have added a "localhost" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key. Now we will create those by adding a simple (but a very long) line in Dockerfile:
 ```Dockerfile
 #----------------------------- 6. Generate SSL certificate and key -------------------------------
@@ -423,7 +423,7 @@ And this is it! Now we have a fully functional ft_server project with NGINX, MyS
 
 You can then simply click on "Advanced" button and then click on "Proceed to localhost (unsafe)" to reach the index homepage of our project.
 
-# 7) Autoindex and wrapping up
+# Autoindex and wrapping up
 
 #### Autoindex
 Normally when your build and run the container now and while it is running you try to reach [**localhost**](https://localhost/) webpage, you will see the contents of your /var/www/localhost/ directory:
