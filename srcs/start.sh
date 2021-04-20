@@ -8,10 +8,10 @@ service mysql start;
 service php7.3-fpm start;
 
 #------------------------ Create & configure Wordpress database ----------------------------------------
-# 1. Create a database named wordpress
+# 1. Connect to MySQL using "root" account and create a database named "wordpress"
 echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password;
 
-# 2. Create a root account which can access all tables in wordpress
+# 2. Gives the user "root" all possible rights related to "wordpress" database
 echo "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost' WITH GRANT OPTION;" | mysql -u root --skip-password;
 
 # 3. Apply the previous changes (otherwise it waits until we restart the server)
