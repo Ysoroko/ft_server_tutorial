@@ -74,7 +74,10 @@ Now if we try to build our docker image and run it, Debian Buster image will be 
 # Install all of the dependencies
 Now that we have our Dockerfile and an empty Debian OS with basic packages, we will install the dependencies and tools needed for further steps in the project.
 
-This is done by adding several `apt-get install` to our Dockerfile. For this project there is a couple of things we need:
+This is done by adding several `apt-get install` to our Dockerfile.
+
+For this project there is a couple of things we need:
+
 ```Dockerfile
 #----------------------------------- 2. Intall Dependencies --------------------------------------
 # Sysvinit-utils for "service" command used to easily start and restart out nginx
