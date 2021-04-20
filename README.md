@@ -15,7 +15,7 @@
 <br />
 
 # Building, running and cleaning up your containers:
-#### You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier([example](./Makefile))
+#### You will often need to test your work. The following commands are used *A LOT* and I recommend to create a Makefile with rules that will execute them for you to make your life easier ([example](./Makefile))
 #### `docker build -t ft_server .` will build our Docker container and name it "ft_server"
 #### `docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will:
   * `run` *run* our container
