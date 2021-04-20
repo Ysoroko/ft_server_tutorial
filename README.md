@@ -24,13 +24,13 @@ You will often need to test your work. The following commands are used *A LOT* a
 `docker system prune` will cleanup the temporary files and the rest of remaining used space
 --------------------------------------------------------------------------------------------------------------------------------------
 # Project parts summary:
-#### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
-#### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
-#### 3) [Install and configure NGINX](#install-and-configure-nginx)
-#### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
-#### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
-#### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
-#### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
+#### - [x] [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
+#### - [x] [Install all of the dependencies](#install-all-of-the-dependencies)
+#### - [x] [Install and configure NGINX](#install-and-configure-nginx)
+#### - [x] [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
+#### - [x] [Install and configure Wordpress](#install-and-configure-wordpress)
+#### - [x] [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
+#### - [x] [Autoindex and wrapping up](#autoindex-and-wrapping-up)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Create a Dockerfile and download a Debian Buster image
