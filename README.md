@@ -30,7 +30,7 @@
 
 # Create a Dockerfile and download a Debian Buster image
 All you need to do is:
-* Create a file called Dockerfile
+* Create a file named Dockerfile
 * Add a line `FROM debian:buster` inside.
 * Add lines `RUN apt-get update` and `RUN apt-get upgrade -y`
 <br />
@@ -448,6 +448,6 @@ For Wordpress, first time you try to open it, it will ask you to create a profil
 
 You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables to make sure the link between the two is working properly.
 
-Since we created auto-signed ssl certificate and key we get the warning "Your connection is not private". However, the ssl protocol is up and running and you can see that the website is using our certificate and key are applied by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command. Another sign that we are using ssl is that we are using https and not http to reach the webpage.
+Since we created auto-signed ssl certificate and key we get the warning "Your connection is not private". However, the ssl protocol is up and running and you can see that the website is using our certificate and key are applied by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command. Another sign that we are using ssl is that we are using https:// and not http:// to reach the webpage.
 
 
