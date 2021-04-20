@@ -417,7 +417,9 @@ In step 3 we have added a "localhost" file in our "srcs" folder which was tellin
 RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
 #-------------------------------------------------------------------------------------------------
 ```
-And this is it! Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol! You can try to build and run your container and then try to open [**localhost**](https://localhost/). In Chrome you will see the following webpage:.
+And this is it! Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol! You can try to build and run your container and then try to open [**localhost**](https://localhost/). In Chrome you will see the following webpage:
+
+![](srcs/images/your_connection_is_not_private.png)
 
 You can then simply click on "Advanced" button and then click on "Proceed to localhost (unsafe)" to reach the index homepage of our project.
 
