@@ -12,7 +12,7 @@ You will often need to test your work. The following commands are used *A LOT* a
 `docker build -t ft_server .` will **_🛠️ build_** our Docker container and name it "ft_server". 
 
 `docker run -it --rm -p 80:80 -p 443:443 ft_server` After it's built this command will  **_🏃‍♂️ run_** our container and:
-  * `-it` open its terminal and allow us to execute commands directly inside (it is useful to manually check the contents of the container)
+  * `-it` open its terminal and allow us to execute commands inside (useful to manually check the contents of the container)
   * `--rm` automatically remove the container once it's stopped
   * `-p` link the necessary ports between the container and our computer (80 and 443)
   * And finally, name it "ft_server"
@@ -44,10 +44,12 @@ Dockerfile is like a Makefile, but instead of executing commands in your termina
 
 The command `FROM` tells Docker to download the image that follows and use the commands we'll add in the next step inside this image.
 
-Here we are using an empty Debian Buster operating system image as asked in the subject. You can imagine that we download an empty Windows or MacOS now and
-in the next step we will start installing the dependencies needed for the rest of our project.
+Here we are using an empty Debian Buster operating system image as asked in the subject.
+
+You can imagine that we download an empty Windows or MacOS now and in the next step we will start installing the dependencies needed for the rest of our project.
 
 Before we do that, we need to update the Debian Buster packages to make sure everything is up to date just as we need.
+
 This is simply done by adding `RUN apt-get update` and `RUN apt-get upgrade -y` to our Dockerfile. 
 
 `RUN` is used in Dockerfile to execute the command inside the image, as if it is entered in the terminal of our Debian OS.
@@ -92,7 +94,7 @@ RUN apt-get -y install php-cgi php-common php-fpm php-pear php-mbstring
 RUN apt-get -y install php-zip php-net-socket php-gd php-xml-util php-gettext php-mysql php-bcmath
 #-------------------------------------------------------------------------------------------------
 ```
-Now if we try to build our docker image and run it, it downloads/updates Debian Buster and also downloads all of the dependencies we need.
+Now if we try to build our docker image and run it, it downloads/updates Debian Buster and downloads all the dependencies we need.
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -104,8 +106,8 @@ Now, we will configure it to connect our container to our webpage.
 
 In order to do so, NGINX will need a configuration file where we will tell it what is our webpage name, what ports he needs to "listen" to and what other tools we will use.
 
-Normally on our computer we would simply create a file and write inside, but since we need to do it inside the container, we prepare the configuration file in advance and
-then copy it inside our container when we need it.
+Normally on our computer we would simply create a file and write inside, but since we need to do it inside the container, we prepare the configuration file in advance and then copy it inside our container when we need it.
+
 In our project folder, let's create a "srcs" folder as required by subject and create an empty file named "localhost" inside.
 
 localhost is the webpage we will be using to acces our web server in this project.
@@ -178,7 +180,9 @@ WORKDIR /var/www/localhost/
 #-------------------------------------------------------------------------------------------------
 ```
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
-and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
+and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container.
+
+We still have no way of reaching our website and checking that everything works, this will be added in the last step.
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -227,8 +231,10 @@ service php7.3-fpm restart;
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
 sleep infinity
 ```
+
 Now that all of the commands we need to execute are ready and waiting in "[start.sh](./srcs/start.sh)" file, let's place it in our
 container and tell our Dockerfile to execute it.
+
 ```Dockerfile
 #----------------------------------- 4. PHP MY ADMIN ---------------------------------------------
 # Move start.sh from our computer inside the container
@@ -238,10 +244,13 @@ COPY ./srcs/start.sh ./
 # CMD tells Docker the default command to execute when we are "running" our container
 CMD bash start.sh;
 ```
+
 Now that we are managing databases with MariaDB and we have created a database, let's download and configure phpMyAdmin to test it! 
 
 First, just as for NGINX, phpMyAdmin will need a configuration file to set up some basic behaviour.
+
 Let's create a "[config.inc.php](./srcs/config.inc.php)" file in our "srcs" folder and add the following lines inside:
+
 ```PHP
 <?php
 /**
@@ -285,7 +294,9 @@ $cfg['SaveDir'] = '';
 ```
 
 Now that we have our phpMyAdmin configuration file ready, let's download phpMyAdmin and set everything up!
+
 Add the following lines to our Dockerfile:
+
 ```Dockerfile
 # Download phpMyAdmin by using "wget" which we installed in step 2
 RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.1.0/phpMyAdmin-5.1.0-english.tar.gz
@@ -302,12 +313,19 @@ COPY ./srcs/config.inc.php phpmyadmin
 ```
 
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
-and also copies our NGINX configuration file inside the container. It also copies our "[start.sh](./srcs/start.sh)" file inside the container which will be executed when we run our container to create a database and a profile to access and use phpMyAdmin. Afterwards, it downloads and installs phpMyAdmin, and copies phpMyAdmin configuration file "[config.inc.php](./srcs/config.inc.php)" inside our container.
+and also copies our NGINX configuration file inside the container.
+
+It also copies our "[start.sh](./srcs/start.sh)" file inside the container which will be executed when we run our container to create a database and a profile to access and use phpMyAdmin.
+
+Afterwards, it downloads and installs phpMyAdmin, and copies phpMyAdmin configuration file "[config.inc.php](./srcs/config.inc.php)" inside our container.
 
 # Install and configure Wordpress
-In step 4 we have already prepared a database for Wordpress. Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
+In step 4 we have already prepared a database for Wordpress.
+
+Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
 
 Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php)" in our "srcs" folder.
+
 Add the following lines inside:
 ```php
 <?php
@@ -409,7 +427,9 @@ That's it! Now we have our debian buster image, all the dependencies we need, NG
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Generate SSL certificate and key
-In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key. Now we will create those by adding a simple (but a very long) line in our [Dockerfile](./Dockerfile):
+In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key.
+
+Now we will create those by adding a simple (but a very long) line in our [Dockerfile](./Dockerfile):
 ```Dockerfile
 #----------------------------- 6. Generate SSL certificate and key -------------------------------
 # SSL creates a secured channel between the web browser and the web server
@@ -428,7 +448,13 @@ In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" fol
 RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
 #-------------------------------------------------------------------------------------------------
 ```
-And this is it! Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol! You can try to build and run your container and then try to open [**localhost**](https://localhost/) webpage. You will see a message of the kind:
+And this is it!
+
+Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol!
+
+You can try to build and run your container and then try to open [**localhost**](https://localhost/) webpage.
+
+You will see a message of the kind:
 
 ![](srcs/images/your_connection_is_not_private.png)
 
@@ -438,7 +464,9 @@ Since we created an auto-signed ssl certificate and key we get the warning "Your
 
 However, the ssl protocol is up and running.
 
-You can see that the website is using our certificate and key by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command. Since we are not a verified party who can issue SSL certificates, we are unfortunately not trustworthy 😢.
+You can see that the website is using our certificate and key by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command.
+
+Since we are not a verified party who can issue SSL certificates, we are unfortunately not trustworthy 😢.
 
 Another sign that we are using ssl is that we are using "https://" and not "http://" to reach the webpage.
 
@@ -451,7 +479,10 @@ Normally when your build and run the container now and while it is running you t
 ![](srcs/images/index.png)
 
 If you click on Wordpress, you will open Wordpress service and the same goes for phpMyAdmin.
+
+
 This "homepage" with all of your contents is displayed because autoindex is activated in our "[localhost](./srcs/localhost)" configuration file:
+
 ```php
 # Enables autoindex to redirect us to the choice between wordpress and phpMyAdmin
 autoindex on;
