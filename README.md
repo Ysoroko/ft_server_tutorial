@@ -1,7 +1,7 @@
 ### This is a complete step-by-step guide to complete ft_server project for 42 coding schools network.
 # Prerequisites:
-### - 📚 You are familiar with all of the concepts and tools needed for this project: containers, images, ports, MariaDB, Wordpress, phpMyAdmin etc.
-### - 🐳 You have Docker installed on your computer and it is running ([**download link**](https://www.docker.com/get-started))
+### - 📚 You know all the concepts and tools needed for this project: containers, images, ports, Nginx etc.
+### - 🐳 You have Docker installed and it is running ([**download link**](https://www.docker.com/get-started))
 <br />
 
 # Project parts summary:
