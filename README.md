@@ -22,6 +22,7 @@ You will often need to test your work. The following commands are used *A LOT* a
 `docker rm $(docker ps -qa)` will remove all the containers
 
 `docker system prune` will cleanup the temporary files and the rest of remaining used space
+
 --------------------------------------------------------------------------------------------------------------------------------------
 # Project parts summary:
 #### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
@@ -92,6 +93,9 @@ RUN apt-get -y install php-zip php-net-socket php-gd php-xml-util php-gettext ph
 #-------------------------------------------------------------------------------------------------
 ```
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster and also downloads all of the dependencies we need.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
 
 # Install and configure NGINX
 In the previous part of the project we have downloaded nginx using `RUN apt-get -y install nginx`.
@@ -177,6 +181,7 @@ Now if we try to build our docker image and run it, it downloads/updates Debian 
 and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
 
 --------------------------------------------------------------------------------------------------------------------------------------
+
 # Install and configure phpMyAdmin
 In step 2 we have installed mariadb-server. Now we will configure it and set up phpMyAdmin to use it.
 
@@ -478,6 +483,7 @@ If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpr
 You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables in "wordpress" -> "wp-users" section to make sure the link between the two is working properly.
 
 --------------------------------------------------------------------------------------------------------------------------------------
+
 # Error checking
 #### In case you complete this tutorial and you get any errors, you can find final versions of each file in this repository to compare them with yours.
 #### Please avoid simply copy/pasting everything as there are a lot of handy new concepts you need to understand and use in a later project "ft_services".
