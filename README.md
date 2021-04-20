@@ -23,8 +23,8 @@
   * `--rm` automatically remove it once it's stopped
   * `-p` link the necessary ports (80 and 443)
   * And finally, name it "ft_server"
-#### `docker rmi $(docker images -q)` will remove all the images previously downloaded in Docker
-#### `docker rm $(docker ps -qa)` will remove all the built containers
+#### `docker rmi $(docker images -q)` will remove all the images
+#### `docker rm $(docker ps -qa)` will remove all the containers
 #### `docker system prune` will cleanup the temporary files and the rest of remaining used space
 <br />
 
