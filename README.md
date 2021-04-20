@@ -101,7 +101,7 @@ In our project folder, let's create a "srcs" folder as required by subject and c
 
 localhost is the webpage we will be using to acces our web server in this project.
 
-Add the following lines to our "localhost" file:
+Add the following lines to our "[**localhost**](./srcs/localhost)" file:
 ```php
 server {
      # tells to listen to port 80
@@ -169,7 +169,7 @@ WORKDIR /var/www/localhost/
 #-------------------------------------------------------------------------------------------------
 ```
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
-and also copies our NGINX configuration file inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
+and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container. We still have no way of reaching our website and checking that everything works, this will be added in the last step.
 <br />
 
 # Install and configure phpMyAdmin
@@ -181,7 +181,7 @@ For our project we need to tell our container to execute these commands automati
 
 This can be achieved by creating a ".sh" file that we will launch when running our container. 
 
-In our "srcs" folder, let's create a "start.sh" file and try to configure mariadb and create a database we can later use for Wordpress by adding the following commands inside:
+In our "srcs" folder, let's create a "[start.sh](./srcs/start.sh)" file and try to configure mariadb and create a database we can later use for Wordpress by adding the following commands inside:
 ```Shell
 # Start up NGINX
 service nginx start;
@@ -217,7 +217,7 @@ service php7.3-fpm restart;
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
 sleep infinity
 ```
-Now that all of the commands we need to execute are ready and waiting in "start.sh" file, let's place it in our
+Now that all of the commands we need to execute are ready and waiting in "[start.sh](./srcs/start.sh)" file, let's place it in our
 container and tell our Dockerfile to execute it.
 ```Dockerfile
 #----------------------------------- 4. PHP MY ADMIN ---------------------------------------------
@@ -231,7 +231,7 @@ CMD bash start.sh;
 Now that we are managing databases with MariaDB and we have created a database, let's download and configure phpMyAdmin to test it! 
 
 First, just as for NGINX, phpMyAdmin will need a configuration file to set up some basic behaviour.
-Let's create a "config.inc.php" file in our "srcs" folder and add the following lines inside:
+Let's create a "[config.inc.php](./srcs/config.inc.php)" file in our "srcs" folder and add the following lines inside:
 ```PHP
 <?php
 /**
@@ -292,12 +292,12 @@ COPY ./srcs/config.inc.php phpmyadmin
 ```
 
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
-and also copies our NGINX configuration file inside the container. It also downloads and installs phpMyAdmin, creates a database and a profile which will be able to access it and copies phpMyAdmin configuration file inside our container.
+and also copies our NGINX configuration file inside the container. It also copies our "[start.sh](./srcs/start.sh)" file inside the container which will be executed when we run our container to create a database and a profile to access and use phpMyAdmin. Afterwards, it downloads and installs phpMyAdmin, and copies phpMyAdmin configuration file "[config.inc.php](./srcs/config.inc.php)" inside our container.
 
 # Install and configure Wordpress
 In step 4 we have already prepared a database for Wordpress. Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
 
-Let's start by creating a configuration file named "wp-config.php" in our "srcs" folder.
+Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php" in our "srcs" folder.
 Add the following lines inside:
 ```php
 <?php
@@ -398,7 +398,7 @@ RUN chmod -R 755 /var/www/*
 That's it! Now we have our debian buster image, all the dependencies we need, NGINX, phpMyAdmin and Wordpress configued. The only thing left to do is setup the SSL protocol and the project is ready!
 
 # Generate SSL certificate and key
-In step 3 we have added a "localhost" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key. Now we will create those by adding a simple (but a very long) line in Dockerfile:
+In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key. Now we will create those by adding a simple (but a very long) line in our [Dockerfile](./Dockerfile):
 ```Dockerfile
 #----------------------------- 6. Generate SSL certificate and key -------------------------------
 # SSL creates a secured channel between the web browser and the web server
@@ -417,7 +417,7 @@ In step 3 we have added a "localhost" file in our "srcs" folder which was tellin
 RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
 #-------------------------------------------------------------------------------------------------
 ```
-And this is it! Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol! You can try to build and run your container and then try to open [**localhost**](https://localhost/). In Chrome you will see the following webpage:
+And this is it! Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol! You can try to build and run your container and then try to open [**localhost**](https://localhost/) webpage. You will see a message of the kind:
 
 ![](srcs/images/your_connection_is_not_private.png)
 
@@ -431,7 +431,7 @@ Normally when your build and run the container now and while it is running you t
 ![](srcs/images/index.png)
 
 If you click on Wordpress, you will open Wordpress service and the same goes for phpMyAdmin.
-This "homepage" with all of your contents is displayed because autoindex is activated in our "localhost" configuration file:
+This "homepage" with all of your contents is displayed because autoindex is activated in our "[localhost](./srcs/localhost)" configuration file:
 ```php
 # Enables autoindex to redirect us to the choice between wordpress and phpMyAdmin
 autoindex on;
