@@ -294,7 +294,7 @@ COPY ./srcs/config.inc.php phpmyadmin
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
 and also copies our NGINX configuration file inside the container. It also downloads and installs phpMyAdmin, creates a database and a profile which will be able to access it and copies phpMyAdmin configuration file inside our container.
 
-# 5) Install and configure Wordpress
+# Install and configure Wordpress
 In step 4 we have already prepared a database for Wordpress. Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
 
 Let's start by creating a configuration file named "wp-config.php" in our "srcs" folder.
