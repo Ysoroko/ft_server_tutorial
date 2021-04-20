@@ -28,6 +28,17 @@
 #### `docker system prune` will cleanup the temporary files and the rest of remaining used space
 <br />
 
+# Error checking
+#### In case you complete this tutorial and you get any errors, you can find final versions of each file in this repository to compare them with yours.
+#### Please avoid simply copy/pasting everything as there are a lot of handy new concepts you need to understand and use in a later project "ft_services".
+* [Dockerfile](./Dockerfile)
+* [localhost](./srcs/localhost)
+* [start.sh](./srcs/start.sh)
+* [config.inc.php](./srcs/config.inc.php)
+* [wp-config.php](./srcs/wp-config.php)
+* (Optional but helpful: [Makefile](./Makefile))
+<br />
+
 # Create a Dockerfile and download a Debian Buster image
 All you need to do is:
 * Create a file named Dockerfile
@@ -150,7 +161,7 @@ server {
  
  Now that our configuration is ready, we will need to add some lines to our Dockerfile to copy it inside the container and set it up:
  ```Dockerfile
-#----------------------------------- 3. Install and cofigure Nginx  ------------------------------
+#----------------------------------- 3. Install and configure Nginx  ------------------------------
 # NGINX will need a folder where it will search for everything related to our website
 RUN mkdir /var/www/localhost
 
@@ -192,7 +203,7 @@ service mysql start;
 # Start up PHP
 service php7.3-fpm start;
 
-#------------------------ Create & configure Wordpress database ----------------------------------------
+#------------------------ Create & configure a Wordpress database --------------------------------------
 # 1. Create a database named wordpress
 echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password;
 
@@ -297,7 +308,7 @@ and also copies our NGINX configuration file inside the container. It also copie
 # Install and configure Wordpress
 In step 4 we have already prepared a database for Wordpress. Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
 
-Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php" in our "srcs" folder.
+Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php)" in our "srcs" folder.
 Add the following lines inside:
 ```php
 <?php
@@ -423,6 +434,14 @@ And this is it! Now we have a fully functional ft_server project with NGINX, MyS
 
 You can then simply click on "Advanced" button and then click on "Proceed to localhost (unsafe)" to reach the index homepage of our project.
 
+Since we created an auto-signed ssl certificate and key we get the warning "Your connection is not private".
+
+However, the ssl protocol is up and running.
+
+You can see that the website is using our certificate and key by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command. Since we are not a verified party who can issue SSL certificates, we are unfortunately not trustworthy 😢.
+
+Another sign that we are using ssl is that we are using "https://" and not "http://" to reach the webpage.
+
 # Autoindex and wrapping up
 
 #### Autoindex
@@ -438,16 +457,26 @@ autoindex on;
 ```
 To deactivate it, you can replace "on" by "off", then rebuild and rerun the container.
 
-This will show you an error while opening [**localhost**](https://localhost/), but Wordpress and phpMyAdmin are
-still accessible by their addresses [**https://localhost/phpmyadmin/**](https://localhost/phpmyadmin/) and [**https://localhost/wordpress/**](https://localhost/phpmyadmin/).
+This will show you an "403 Forbidden" error while opening [**localhost**](https://localhost/), but Wordpress and phpMyAdmin are
+still accessible by their addresses [**https://localhost/phpmyadmin/**](https://localhost/phpmyadmin/) and [**https://localhost/wordpress/**](https://localhost/phpmyadmin/)
 
 #### Wrapping up
-You can now login into phpMyAdmin by using "root" username and an empty password (this was setup in our start.sh file and we can create an empty password because we allowed it in "config.inc.php" file). Inside, you will be able to check out the Wordpress database and the changes like newly created users/posts etc.
+You can now open Wordpress by clicking on it on autoindex homepage or reaching [**https://localhost/wordpress/**](https://localhost/phpmyadmin/).
 
-For Wordpress, first time you try to open it, it will ask you to create a profile and afterwards you will be able to login with it and use all of the Wordpress features like themes, posts etc.
+The first time, it will ask you to create a profile and afterwards you will be able to login with it and use all of the Wordpress features like themes, posts etc.
 
-You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables to make sure the link between the two is working properly.
+![](srcs/images/wordpress_install.png)
 
-Since we created auto-signed ssl certificate and key we get the warning "Your connection is not private". However, the ssl protocol is up and running and you can see that the website is using our certificate and key are applied by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command. Another sign that we are using ssl is that we are using https:// and not http:// to reach the webpage.
+![](srcs/images/wordpress_admin.png)
 
+Afterwards, you can login into phpMyAdmin by using "root" username and an empty password (this was setup in our "[start.sh](./srcs/start.sh)" file and we can create an empty password because we allowed it in "[config.inc.php](./srcs/config.inc.php)" file). 
+
+While in phpMyAdmin you will be able to check out the Wordpress database and the changes like newly created users/posts etc. 
+
+If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpress" section is going to be empty.
+![](srcs/images/phpMyAdmin_login.png)
+
+![](srcs/images/phpMyAdmin.png)
+
+You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables in "wordpress" -> "wp-users" section to make sure the link between the two is working properly.
 
