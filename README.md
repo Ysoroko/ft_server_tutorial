@@ -40,6 +40,7 @@ All you need to do is:
 * Add a line `FROM debian:buster` inside.
 * Add lines `RUN apt-get update` and `RUN apt-get upgrade -y`
 <br />
+
 Dockerfile is like a Makefile, but instead of executing commands in your terminal it will do it inside Docker images.
 
 The command `FROM` tells Docker to download the image that follows and use the commands we'll add in the next step inside this image.
