@@ -234,6 +234,10 @@ service php7.3-fpm restart;
 # running. There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
 sleep infinity
+
+# Please note that since "sleep infinity" is executed while running our container,
+# the "docker run" flags "-it" (= terminal mode with a "pretty" format) are not going to do anything anymore.
+# If you still want to run your container in terminal mode, you can remove the "sleep infinity" command
 ```
 
 Now that all of the commands we need to execute are ready and waiting in "[start.sh](./srcs/start.sh)" file, let's place it in our
