@@ -8,6 +8,7 @@ service mysql start;
 service php7.3-fpm start;
 
 #------------------------ Create & configure Wordpress database ----------------------------------------
+
 # 1. Connect to MySQL using "root" account and create a database named "wordpress"
 echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password;
 
@@ -21,6 +22,8 @@ echo "FLUSH PRIVILEGES;" | mysql -u root --skip-password;
 # Since we setup no password, it wouldn't let us connect to phpMyAdmin otherwise
 echo "update mysql.user set plugin='' where user='root';" | mysql -u root --skip-password;
 
+#------------------------------------------------------------------------------------------------------
+
 # Restart the nginx to apply the changes
 service nginx restart;
 
@@ -31,3 +34,7 @@ service php7.3-fpm restart;
 # running. There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
 sleep infinity
+
+# Please note that since "sleep infinity" is executed while running our container,
+# the "docker run" flags "-it" (= terminal mode with a "pretty" format) are not going to do anything anymore.
+# If you still want to run your container in terminal mode, you can remove the "sleep infinity" command
