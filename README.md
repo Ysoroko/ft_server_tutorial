@@ -210,7 +210,8 @@ service mysql start;
 # Start up PHP
 service php7.3-fpm start;
 
-#------------------------ Create & configure a Wordpress database --------------------------------------
+#------------------------ Create & configure Wordpress database ----------------------------------------
+
 # 1. Connect to MySQL using "root" account and create a database named "wordpress"
 echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password;
 
@@ -224,6 +225,7 @@ echo "FLUSH PRIVILEGES;" | mysql -u root --skip-password;
 # Since we setup no password, it wouldn't let us connect to phpMyAdmin otherwise
 echo "update mysql.user set plugin='' where user='root';" | mysql -u root --skip-password;
 
+#------------------------------------------------------------------------------------------------------
 # Restart the nginx to apply the changes
 service nginx restart;
 
