@@ -139,7 +139,7 @@ server {
  
  Now that our configuration is ready, we will need to add some lines to our Dockerfile to copy it inside the container and set it up:
  ```Dockerfile
-#----------------------------------- 3. Install and configure Nginx  ------------------------------
+#---------------------------------- 3. Install and configure Nginx  ------------------------------
 # NGINX will need a folder where it will search for everything related to our website
 # We can use the "html" folder that already exists in var/www directory,
 # but it's a good practice to have a separate folder for every website in case we create more than 1
@@ -176,6 +176,8 @@ Later, I will explain a more elegant solution to automatically start NGINX and o
 
 After one of these commands is executed, if you try to reach [0.0.0.0](http://0.0.0.0) or [127.0.0.1](http://127.0.0.1) in your browser while the container is running you will now get "Welcome to nginx!" webpage, which confirms that NGINX is configured properly 🙌
 
+![](srcs/images/welcome_nginx.png)
+
 --------------------------------------------------------------------------------------------------------------------------------------
 
 # Add SSL protocol and autoindex
@@ -192,7 +194,7 @@ This can be done by using `openssl` command. [explanation here](https://linuxize
 So let's add the necessary command in our [Dockerfile](./Dockerfile):
 
 ```Dockerfile
-#----------------------------- 4. Add SSL protocol and autoindex -------------------------------
+#------------------------------ 4. Add SSL protocol and autoindex --------------------------------
 # SSL creates a secured channel between the web browser and the web server
 #
 # "openssl" command allows us to create a certificate and key ourselves
@@ -297,9 +299,9 @@ NGINX configuration file (or 403_forbidden error when the autoindex is turned of
 # Install and configure phpMyAdmin
 In step 2 we have installed mariadb-server by using `RUN apt-get -y install mariadb-server`.
 
-Now we will download phpMyAdmin, and configure it to use MariaDB.
+Now we will create a sample database, download and configure phpMyAdmin and make sure it works by detecting our database.
 
-[**Here (at step 2)**](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10) you can see how to install, launch and setup mariadb databases by running several commands inside Debian Buster terminal. 
+[**Here (at step 2)**](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10) you can see how to create and setup a mariadb database by running several commands inside Debian Buster terminal. 
 
 For our project we need to tell our container to execute these commands automatically, without typing them ourselves.
 
@@ -370,7 +372,7 @@ Now that all of the commands we need to execute are ready and waiting in "[start
 container and tell our Dockerfile to execute it when we run our container.
 
 ```Dockerfile
-#----------------------------------- 4. PHP MY ADMIN ---------------------------------------------
+#----------------------------------- 5. PHP MY ADMIN ---------------------------------------------
 # Move start.sh from our computer inside the container
 COPY ./srcs/start.sh ./
 
@@ -463,7 +465,7 @@ Our autoindex homepage will now look like this:
 
 ![](srcs/images/autoindex_phpmyAdmin.png)
 
-By clicking on phpMyAdmin we will be able to login into phpMyAdmin using "root" login without a password:
+By clicking on "phpmyadmin/" we will be able to login into phpMyAdmin using "root" login without a password:
 
 ![](srcs/images/phpMyAdmin_login.png)
 
@@ -471,18 +473,20 @@ Inside on the left side we will be able to see the "wordpress" database
 we created earlier which is currently empty if we click on it.
 
 This proves that phpMyAdmin is capable of reaching that database and is setup properly.
+
 ![](srcs/images/phpmyadmin_wp_db.png)
 
 We can also see an error displying which is caused by access rights configuration of our phpMyAdmin files.
 
 We will solve this issue in the next step by modifying the ownership and access rights of the files in our working directory.
+
 ![](srcs/images/phpmyadmin_error.png)
 
 You can also note that if we disable the autoindex at this point, we will still get the same "403 Forbidden" error while trying to reach [localhost webpage](https://localhost) but we are able to reach phpMyAdmin by reaching [https://localhost/phpmyadmin/](https://localhost/phpmyadmin/)
 
 This shows that the autoindex is only responsible for our "index of /" homepage.
 
-Now we are almost at the end, the only thing we still need to do is install Wordpress. Let's go!
+Now we are almost at the end, the only thing we still need to do is install Wordpress. Let's go 💪!
 
 # Install and configure Wordpress
 In the previous step we have already created and prepared a database for Wordpress with mySQL.
