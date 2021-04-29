@@ -28,10 +28,10 @@ You will often need to test your work. The following commands are used *A LOT* a
 #### 1) [Create a Dockerfile and download a Debian Buster image](#create-a-dockerfile-and-download-a-debian-buster-image)
 #### 2) [Install all of the dependencies](#install-all-of-the-dependencies)
 #### 3) [Install and configure NGINX](#install-and-configure-nginx)
-#### 4) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
-#### 5) [Install and configure Wordpress](#install-and-configure-wordpress)
-#### 6) [Generate SSL certificate and key](#generate-ssl-certificate-and-key)
-#### 7) [Autoindex and wrapping up](#autoindex-and-wrapping-up)
+#### 4) [Add SSL protocol and autoindex](#add-ssl-protocol-and-autoindex)
+#### 5) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
+#### 6) [Install and configure Wordpress](#install-and-configure-wordpress)
+#### 7) [Wrapping up](#autoindex-and-wrapping-up)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Create a Dockerfile and download a Debian Buster image
@@ -53,7 +53,12 @@ Before we do that, we need to update the Debian Buster packages to make sure eve
 
 This is simply done by adding `RUN apt-get update` and `RUN apt-get upgrade -y` to our Dockerfile. 
 
-`RUN` is used in Dockerfile to execute the command inside the image, as if it is entered in the terminal of our Debian OS.
+`RUN` is used in Dockerfile to execute the command inside the image during the container build phase, as if it is entered in the terminal of our Debian OS.
+
+It is mostly used to install dependencies and set up the configuration files.
+
+For any commands that need to be ran during the container run phase (to start services like NGINX),
+we will use the command `CMD` instead which will be explained later on.
 
 <br />
 
@@ -80,7 +85,7 @@ For this project there is a couple of things we need:
 
 ```Dockerfile
 #----------------------------------- 2. Intall Dependencies --------------------------------------
-# Sysvinit-utils for "service" command used to easily start and restart out nginx
+# Sysvinit-utils for "service" command used to easily start and restart our nginx/php/mysql
 RUN apt-get install sysvinit-utils
 
 # Wget is used to easily download phpMyAdmin / Wordpress
@@ -119,7 +124,7 @@ localhost is the webpage we will be using to acces our web server in this projec
 Add the following lines to our "[**localhost**](./srcs/localhost)" file:
 ```php
 server {
-     # tells to listen to port 80
+     # tells to listen to port 80 (http port)
      listen 80;
      # same but for IPV6
      listen [::]:80;
@@ -129,44 +134,15 @@ server {
      # when we try to reach the website name in our browser
      return 301 https://$host$request_uri;
  }
- server {
-    # tells to listen to port 443
-    listen 443 ssl;
-    # same but for IPV6
-    listen [::]:443 ssl;
-    # tells the name(s) of our website
-    server_name localhost www.localhost;
-
-    # Enables SSL protocol
-    ssl on;
-    # Tells where to look for SSL certificate
-    ssl_certificate /etc/ssl/nginx-selfsigned.crt;
-    # Tells where to look for SSL key
-    ssl_certificate_key /etc/ssl/nginx-selfsigned.key;
-
-    # Tells where to look for all the files related to our website
-    root /var/www/localhost;
-    # Enables autoindex to redirect us to the choice between wordpress and phpMyAdmin
-    autoindex on;
-    # Tells the possible names of the index file
-    index index.html index.htm index.php;
-    # Tells to check for existence of files before moving on
-	location / {
-		try_files $uri $uri/ =404;
-	}
-    # Specifies the php configuration
-	location ~ \.php$ {
-		include snippets/fastcgi-php.conf;
-		fastcgi_pass unix:/run/php/php7.3-fpm.sock;
-	}
- }
  ```
- At this point we have added inside everything we need for the entire project, but some parts aren't functionnal yet and will be added further in this guide.
+ We just told NGINX to listen to http port 80, told it the name of our website and setup a redirection to it.
  
  Now that our configuration is ready, we will need to add some lines to our Dockerfile to copy it inside the container and set it up:
  ```Dockerfile
 #----------------------------------- 3. Install and configure Nginx  ------------------------------
 # NGINX will need a folder where it will search for everything related to our website
+# We can use the "html" folder that already exists in var/www directory,
+# but it's a good practice to have a separate folder for every website in case we create more than 1
 RUN mkdir /var/www/localhost
 
 # COPY copies files from the given directory on our computer to given directory inside our container.
@@ -186,20 +162,165 @@ WORKDIR /var/www/localhost/
 Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
 and also copies our NGINX configuration file named "[**localhost**](./srcs/localhost)" inside the container.
 
-We still have no way of reaching our website and checking that everything works, this will be added in the last step.
+However, we still cannot reach the localhost or local ip address websites. Why is that?
+
+The answer is simple: NGINX is intalled but it is not running, so it is not doing anything yet!
+
+Let's activate it!
+
+When we build the container and run it in terminal mode, we will be able to see the container's prompt.
+
+To activate NGINX, we can simply execute "nginx" or "service nginx start" inside this prompt.
+
+Later, I will explain a more elegant solution to automatically start NGINX and other services while running our container.
+
+After one of these commands is executed, if you try to reach [0.0.0.0](http://0.0.0.0) or [127.0.0.1](http://127.0.0.1) in your browser while the container is running you will now get "Welcome to nginx!" webpage, which confirms that NGINX is configured properly 🙌
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+# Add SSL protocol and autoindex
+Previously we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX to listen to http port.
+
+In this step, we will setup SSL protocol to secure the connection to our website.
+
+#### SSL Protocol
+
+First we will need to generate SSL certificate and key.
+
+This can be done by using `openssl` command. [explanation here](https://linuxize.com/post/creating-a-self-signed-ssl-certificate/)
+
+So let's add the necessary command in our [Dockerfile](./Dockerfile):
+
+```Dockerfile
+#----------------------------- 4. Add SSL protocol and autoindex -------------------------------
+# SSL creates a secured channel between the web browser and the web server
+#
+# "openssl" command allows us to create a certificate and key ourselves
+# here below is the explanation of the flags used:
+# -x509 specifies a self signed certificate
+# -nodes specifies that the private key wont be encrypted
+# -days specifies the validity (in days) of the certificate
+# -subj allows us to use the following string (and not create a separate file for it)
+# The next line is personnal information, you will need to use your own
+# -newkey creates a new certificate request and a new private key 
+# -rsa 2018 is the standard key size (in bits)
+# -keyout specifies where to save the key
+# -out specifies the file name
+RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
+#-------------------------------------------------------------------------------------------------
+```
+
+Now that we have our SSL certificate and key, let's configure the SSL protocol in our "localhost" NGINX configuration file.
+
+While we are here, we will also add the autoindex section which will allow us to see the contents of our "var/www/localhost" directory
+when reaching our website.
+
+We will add the following lines at the end (after the first "server" section):
+
+```php
+server {
+    # tells to listen to port 443
+    listen 443 ssl;
+    # same but for IPV6
+    listen [::]:443 ssl;
+    # tells the name(s) of our website
+    server_name localhost www.localhost;
+
+    # Enables SSL protocol
+    ssl on;
+    # Tells where to look for SSL certificate (needs to be the same as in our openssl command before)
+    ssl_certificate /etc/ssl/nginx-selfsigned.crt;
+    # Tells where to look for SSL key (needs to be the same as in our openssl command before)
+    ssl_certificate_key /etc/ssl/nginx-selfsigned.key;
+
+    # Tells where to look for all the files related to our website
+    root /var/www/localhost;
+    # Enables autoindex to see the contents of the previous line's directory when we reach our website
+    autoindex on;
+    # Tells the possible names of the index file
+    index index.html index.htm index.nginx-debian.html index.php;
+    # Tells to check for existence of files before moving on
+	location / {
+		try_files $uri $uri/ =404;
+	}
+    # Specifies the php configuration
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+	}
+ }
+ ```
+Our "localhost" file should now look like [this](./srcs/localhost).
+
+We have now succesfully added SSL protocol to our website!
+
+You can try to build and run your container in terminal mode, then start up NGINX just as before (by running "nginx" or "service nginx start").
+
+At this point of our project, if you try to reach [localhost webpage](https://localhost/), you will see a message of the kind:
+
+![](srcs/images/your_connection_is_not_private.png)
+
+You can then simply click on "Advanced" button and then click on "Proceed to localhost (unsafe)" to reach the index homepage of our project.
+
+The contents of our /var/www/localhost are empty so you will see the following:
+
+![](srcs/images/empty_index.png)
+
+#### Autoindex
+
+As stated before, this "index of /" homepage is displayed because Autoindex is activated.
+
+To deactivate it, you can replace "on" by "off" in "localhost" file, then rebuild and rerun the container (don't forget to start up nginx).
+
+This will deactivate our "index of /" homepage and result in a "403 Forbidden" error while opening localhost webpage.
+
+![](srcs/images/403_forbidden.png)
+
+Since we created an auto-signed ssl certificate and key we get the warning "Your connection is not private".
+
+However, the ssl protocol is up and running.
+
+You can see that the website is using our certificate and key by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command.
+
+Since we are not a verified party who can issue SSL certificates, we are unfortunately not trustworthy 😢.
+
+Another sign that we are using ssl is that we are using "https://" and not "http://" to reach the webpage.
+
+#### Conclusion
+
+In this step we have added the SSL protocol and the autoindex. Our website is now reachable via [localhost webpage](https://localhost/),
+it uses a secure connection and it displays the contents of the container's /var/www/localhost directory when the autoindex is turned on in our localhost
+NGINX configuration file (or 403_forbidden error when the autoindex is turned off).
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
 # Install and configure phpMyAdmin
-In step 2 we have installed mariadb-server. Now we will configure it and set up phpMyAdmin to use it.
+In step 2 we have installed mariadb-server by using `RUN apt-get -y install mariadb-server`.
 
-[**Here (step 2)**](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10) you can see how to install, launch and setup mariadb databases by running several commands inside Debian Buster terminal. 
+Now we will download phpMyAdmin, and configure it to use MariaDB.
 
-For our project we need to tell our container to execute these commands automatically, without us typing them ourselves. 
+[**Here (at step 2)**](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mariadb-php-lemp-stack-on-debian-10) you can see how to install, launch and setup mariadb databases by running several commands inside Debian Buster terminal. 
 
-This can be achieved by creating a ".sh" file that we will launch when running our container. 
+For our project we need to tell our container to execute these commands automatically, without typing them ourselves.
 
-In our "srcs" folder, let's create a "[start.sh](./srcs/start.sh)" file and try to configure mariadb and create a database we can later use for Wordpress by adding the following commands inside:
+This can be achieved by creating a ".sh" file with some "echo" commands and pipes that we will execute when running our container. 
+
+Also in previous steps we had to manually type "nginx" or "service nginx start" in the container's terminal to start up NGINX.
+
+No more 😎!
+
+This command will now be placed in ".sh" file and executed with all the other commands we need.
+
+In our "srcs" folder, let's create a "[start.sh](./srcs/start.sh)" file.
+
+We will need to:
+1) Start all the required services 
+2) Create a database we can later use for Wordpress to check that our phpMyAdmin detects it
+3) Make sure that the database has correct access rights so that we can freely use it
+4) Restart some services to apply the changes
+
+To do so, let's add the following lines to our "[start.sh](./srcs/start.sh)" file:
+
 ```Shell
 # Start up NGINX
 service nginx start;
@@ -232,18 +353,21 @@ service nginx restart;
 # Restart php to apply the changes
 service php7.3-fpm restart;
 
-# At this point the commands will be executed once and that's it, we need to be able to keep our server
-# running. There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
+# At this point the commands will be executed once and the server will shut down.
+# We need to be able to keep our server running.
+# There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
+# in the terminal
 sleep infinity
 
 # Please note that since "sleep infinity" is executed while running our container,
 # the "docker run" flags "-it" (= terminal mode with a "pretty" format) are not going to do anything anymore.
 # If you still want to run your container in terminal mode, you can remove the "sleep infinity" command
+# or simply replace "sleep infinity" with "bash" command
 ```
 
 Now that all of the commands we need to execute are ready and waiting in "[start.sh](./srcs/start.sh)" file, let's place it in our
-container and tell our Dockerfile to execute it.
+container and tell our Dockerfile to execute it when we run our container.
 
 ```Dockerfile
 #----------------------------------- 4. PHP MY ADMIN ---------------------------------------------
@@ -255,9 +379,16 @@ COPY ./srcs/start.sh ./
 CMD bash start.sh;
 ```
 
-Now that we are managing databases with MariaDB and we have created a database, let's download and configure phpMyAdmin to test it! 
+Now that we have created a database, let's download and configure phpMyAdmin to test it!
 
 First, just as for NGINX, phpMyAdmin will need a configuration file to set up some basic behaviour.
+
+[Here](https://docs.phpmyadmin.net/fr/latest/config.html) you can find all the information about the
+values inside of the phpMyAdmin configuration file and [here](https://docs.phpmyadmin.net/fr/latest/config.html#config-examples)
+you can find some examples.
+
+I will be using a default configuration with all the commented out parts removed and with only
+"blowfish secret", "host" and "AllowNoPassword" fields modified. 
 
 Let's create a "[config.inc.php](./srcs/config.inc.php)" file in our "srcs" folder and add the following lines inside:
 
@@ -309,12 +440,14 @@ Add the following lines to our Dockerfile:
 
 ```Dockerfile
 # Download phpMyAdmin by using "wget" which we installed in step 2
+# At the time you do this you might need to download a different version from 5.1.0
+# Try to always use the latest version
 RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.1.0/phpMyAdmin-5.1.0-english.tar.gz
 
 # Extract the downloaded compressed files and remove the ".tar" file we no longer need
 RUN tar -xf phpMyAdmin-5.1.0-english.tar.gz && rm -rf phpMyAdmin-5.1.0-english.tar.gz
 
-# Move the extracted files in the "phpmyadmin" folder
+# Rename the downloaded folder by "phpmyadmin"
 RUN mv phpMyAdmin-5.1.0-english phpmyadmin
 
 # Copy the "config.inc.php" file we created to the same "phpmyadmin" folder
@@ -322,17 +455,43 @@ COPY ./srcs/config.inc.php phpmyadmin
 #-------------------------------------------------------------------------------------------------
 ```
 
-Now if we try to build our docker image and run it, it downloads/updates Debian Buster, all of the dependencies we need
-and also copies our NGINX configuration file inside the container.
+Now if we try to build our docker image and run it we will obtain a container with phpMyAdmin configured and running
+and also with an empty "wordpress" database created using MySQL. We no longer need to start up NGINX manually and
+our website now looks different.
 
-It also copies our "[start.sh](./srcs/start.sh)" file inside the container which will be executed when we run our container to create a database and a profile to access and use phpMyAdmin.
+Our autoindex homepage will now look like this:
 
-Afterwards, it downloads and installs phpMyAdmin, and copies phpMyAdmin configuration file "[config.inc.php](./srcs/config.inc.php)" inside our container.
+![](srcs/images/autoindex_phpmyAdmin.png)
+
+By clicking on phpMyAdmin we will be able to login into phpMyAdmin using "root" login without a password:
+
+![](srcs/images/phpMyAdmin_login.png)
+
+Inside on the left side we will be able to see the "wordpress" database
+we created earlier which is currently empty if we click on it.
+
+This proves that phpMyAdmin is capable of reaching that database and is setup properly.
+![](srcs/images/phpmyadmin_wp_db.png)
+
+We can also see an error displying which is caused by access rights configuration of our phpMyAdmin files.
+
+We will solve this issue in the next step by modifying the ownership and access rights of the files in our working directory.
+![](srcs/images/phpmyadmin_error.png)
+
+You can also note that if we disable the autoindex at this point, we will still get the same "403 Forbidden" error while trying to reach [localhost webpage](https://localhost) but we are able to reach phpMyAdmin by reaching [https://localhost/phpmyadmin/](https://localhost/phpmyadmin/)
+
+This shows that the autoindex is only responsible for our "index of /" homepage.
+
+Now we are almost at the end, the only thing we still need to do is install Wordpress. Let's go!
 
 # Install and configure Wordpress
-In step 4 we have already prepared a database for Wordpress.
+In the previous step we have already created and prepared a database for Wordpress with mySQL.
 
-Now we will create a configuration file for Wordpress, download it using "wget" and set it up.
+Now we will create a Wordpress configuration file, download Wordpress using "wget" and set it all up.
+
+Just as with phpMyAdmin, I will be using a [default Wordpress configuration file](https://github.com/WordPress/WordPress/blob/master/wp-config-sample.php).
+
+I will only modify the "DB_NAME", "DB_USER" and "DB_PASSWORD" fields to match our wodpress database values and leave the rest of it as it is.
 
 Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php)" in our "srcs" folder.
 
@@ -414,6 +573,13 @@ require_once( ABSPATH . 'wp-settings.php' );
 
 Now that we have our configuration file ready, let's download Wordpress and configure our container!
 
+The procedure is very similar to phpMyAdmin.
+
+The only things extra that we will add here are the commands `chown` and `chmod`.
+
+These commands are used to solve the problem we had in phpMyAdmin in previous step, where
+phpMyAdmin couldn't access certain required files.
+
 Add the following lines in our Dockerfile:
 
 ```Dockerfile
@@ -433,93 +599,33 @@ RUN chown -R www-data:www-data *
 RUN chmod -R 755 /var/www/*
 #-------------------------------------------------------------------------------------------------
 ```
-That's it! Now we have our debian buster image, all the dependencies we need, NGINX, phpMyAdmin and Wordpress configued. The only thing left to do is setup the SSL protocol and the project is ready!
 
---------------------------------------------------------------------------------------------------------------------------------------
-# Generate SSL certificate and key
-In step 3 we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX where to look for the ssl certificate and key.
-
-Now we will create those by adding a simple (but a very long) line in our [Dockerfile](./Dockerfile):
-```Dockerfile
-#----------------------------- 6. Generate SSL certificate and key -------------------------------
-# SSL creates a secured channel between the web browser and the web server
-#
-# "openssl" command allows us to create a certificate and key ourselves
-# here below is the explanation of the flags used:
-# -x509 specifies a self signed certificate
-# -nodes specifies that the private key wont be encrypted
-# -days specifies the validity (in days) of the certificate
-# -subj allows us to use the following string (and not create a separate file for it)
-# The next line is personnal information, you will need to use your own
-# -newkey creates a new certificate request and a new private key 
-# -rsa 2018 is the standard key size (in bits)
-# -keyout specifies where to save the key
-# -out specifies the file name
-RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
-#-------------------------------------------------------------------------------------------------
-```
-And this is it!
+And this is it, our project is 100% ready
 
 Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol!
 
-You can try to build and run your container and then try to open [**localhost**](https://localhost/) webpage.
-
-You will see a message of the kind:
-
-![](srcs/images/your_connection_is_not_private.png)
-
-You can then simply click on "Advanced" button and then click on "Proceed to localhost (unsafe)" to reach the index homepage of our project.
-
-Since we created an auto-signed ssl certificate and key we get the warning "Your connection is not private".
-
-However, the ssl protocol is up and running.
-
-You can see that the website is using our certificate and key by clicking "Not Secure" -> Certificate (on Google Chrome) to see all the details we entered before in openssl command.
-
-Since we are not a verified party who can issue SSL certificates, we are unfortunately not trustworthy 😢.
-
-Another sign that we are using ssl is that we are using "https://" and not "http://" to reach the webpage.
-
---------------------------------------------------------------------------------------------------------------------------------------
-# Autoindex and wrapping up
-
-#### Autoindex
-Normally when your build and run the container now and while it is running you try to reach [**localhost**](https://localhost/) webpage, you will see the contents of your /var/www/localhost/ directory:
+If you build and run our container now, our autoindex homepage will look like this:
 
 ![](srcs/images/index.png)
 
-If you click on Wordpress, you will open Wordpress service and the same goes for phpMyAdmin.
+Just as with phpMyAdmin, if you turn autoindex off, you will get a 403 Forbidden error when reaching [localhost](https://localhost) webpage
+but you will be able to open wordpress by reaching [https://localhost/wordpress](https://localhost/wordpress)
 
-
-This "homepage" with all of your contents is displayed because autoindex is activated in our "[localhost](./srcs/localhost)" configuration file:
-
-```php
-# Enables autoindex to redirect us to the choice between wordpress and phpMyAdmin
-autoindex on;
-```
-To deactivate it, you can replace "on" by "off", then rebuild and rerun the container.
-
-This will show you an "403 Forbidden" error while opening [**localhost**](https://localhost/), but Wordpress and phpMyAdmin are
-still accessible by their addresses [**https://localhost/phpmyadmin/**](https://localhost/phpmyadmin/) and [**https://localhost/wordpress/**](https://localhost/phpmyadmin/)
-
-#### Wrapping up
-You can now open Wordpress by clicking on it on autoindex homepage or reaching [**https://localhost/wordpress/**](https://localhost/phpmyadmin/).
-
-The first time, it will ask you to create a profile and afterwards you will be able to login with it and use all of the Wordpress features like themes, posts etc.
+The first time you open Wordpess, it will ask you to create a profile and afterwards you will be able to login with it and use all of the Wordpress features like themes, posts etc.
 
 ![](srcs/images/wordpress_install.png)
 
 ![](srcs/images/wordpress_admin.png)
 
-Afterwards, you can login into phpMyAdmin by using "root" username and an empty password (this was setup in our "[start.sh](./srcs/start.sh)" file and we can create an empty password because we allowed it in "[config.inc.php](./srcs/config.inc.php)" file). 
+Afterwards if you open phpMyAdmin and you click on the Wordpress database it will no longer be empty.
 
-While in phpMyAdmin you will be able to check out the Wordpress database and the changes like newly created users/posts etc. 
+You will be able to see the user you created to access Wordpress and any new posts/pages you try to create in Wordpress.
 
-If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpress" section is going to be empty.
+(Note: If you didn't open and setup Wordpress before you got to phpMyAdmin, the "Wordpress" section is still going to be empty)
 
-![](srcs/images/phpMyAdmin_login.png)
+Since we changed the ownership and access rights of all the required files, the phpMyAdmin error we saw before should no longer be present.
 
-![](srcs/images/phpMyAdmin.png)
+![](srcs/images/phpmyadmin_wp_full.png)
 
 You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables in "wordpress" -> "wp-users" section to make sure the link between the two is working properly.
 
@@ -544,5 +650,9 @@ You can check that the profile you created to access Wordpress is actually appea
 - [**Generating a self signed SSL key**](https://linuxize.com/post/creating-a-self-signed-ssl-certificate/)
 - [**Incomplete project guide by a 42 student (part 1)**](https://forhjy.medium.com/how-to-install-lemp-wordpress-on-debian-buster-by-using-dockerfile-1-75ddf3ede861)
 - [**Incomplete project guide by a 42 student (part 2)**](https://forhjy.medium.com/42-ft-server-how-to-install-lemp-wordpress-on-debian-buster-by-using-dockerfile-2-4042adb2ab2c)
+- [**PhpMyAdmin configuration file values explained**](https://docs.phpmyadmin.net/fr/latest/config.html)
+- [**PhpMyAdmin configuration file default example**](https://docs.phpmyadmin.net/fr/latest/config.html#config-examples)
+- [**Wordpress default configuration file**](https://github.com/WordPress/WordPress/blob/master/wp-config-sample.php)
+- [**How to edit Wordpress configuration file**](https://www.wpbeginner.com/beginners-guide/how-to-edit-wp-config-php-file-in-wordpress/)
 
 --------------------------------------------------------------------------------------------------------------------------------------
