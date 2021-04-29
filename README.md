@@ -183,13 +183,14 @@ After one of these commands is executed, if you try to reach [0.0.0.0](http://0.
 # Add SSL protocol and autoindex
 Previously we have added a "[localhost](./srcs/localhost)" file in our "srcs" folder which was telling NGINX to listen to http port.
 
-In this step, we will setup SSL protocol to secure the connection to our website.
+In this step, we will setup SSL protocol to secure the connection to our website and add an autoindex which will display
+the contents of our website as a directory on our homepage.
 
 #### SSL Protocol
 
-First we will need to generate SSL certificate and key.
+First we will need to generate the SSL certificate and key.
 
-This can be done by using `openssl` command. [explanation here](https://linuxize.com/post/creating-a-self-signed-ssl-certificate/)
+This can be done by using `openssl` command [(explanation here)](https://linuxize.com/post/creating-a-self-signed-ssl-certificate/)
 
 So let's add the necessary command in our [Dockerfile](./Dockerfile):
 
@@ -254,7 +255,7 @@ server {
  ```
 Our "localhost" file should now look like [this](./srcs/localhost).
 
-We have now succesfully added SSL protocol to our website!
+We have now succesfully added SSL protocol to our website and added an autoindex!
 
 You can try to build and run your container in terminal mode, then start up NGINX just as before (by running "nginx" or "service nginx start").
 
@@ -274,7 +275,7 @@ As stated before, this "index of /" homepage is displayed because Autoindex is a
 
 To deactivate it, you can replace "on" by "off" in "localhost" file, then rebuild and rerun the container (don't forget to start up nginx).
 
-This will deactivate our "index of /" homepage and result in a "403 Forbidden" error while opening localhost webpage.
+This will deactivate our "index of /" homepage and result in a "403 Forbidden" error while opening [localhost](https://localhost) webpage.
 
 ![](srcs/images/403_forbidden.png)
 
@@ -290,7 +291,7 @@ Another sign that we are using ssl is that we are using "https://" and not "http
 
 #### Conclusion
 
-In this step we have added the SSL protocol and the autoindex. Our website is now reachable via [localhost webpage](https://localhost/),
+In this step we have added the SSL protocol and the autoindex. Our website is now reachable via [localhost](https://localhost/) webpage,
 it uses a secure connection and it displays the contents of the container's /var/www/localhost directory when the autoindex is turned on in our localhost
 NGINX configuration file (or 403_forbidden error when the autoindex is turned off).
 
@@ -482,11 +483,11 @@ We will solve this issue in the next step by modifying the ownership and access 
 
 ![](srcs/images/phpmyadmin_error.png)
 
-You can also note that if we disable the autoindex at this point, we will still get the same "403 Forbidden" error while trying to reach [localhost webpage](https://localhost) but we are able to reach phpMyAdmin by reaching [https://localhost/phpmyadmin/](https://localhost/phpmyadmin/)
+You can also note that if we disable the autoindex at this point, we will still get the same "403 Forbidden" error while trying to reach [localhost](https://localhost) webpage but we are able to reach phpMyAdmin by reaching [https://localhost/phpmyadmin/](https://localhost/phpmyadmin/)
 
 This shows that the autoindex is only responsible for our "index of /" homepage.
 
-Now we are almost at the end, the only thing we still need to do is install Wordpress. Let's go 💪!
+Now we are almost at the end, the only thing we still need to do is install Wordpress. Let's go 💪
 
 # Install and configure Wordpress
 In the previous step we have already created and prepared a database for Wordpress with mySQL.
@@ -495,7 +496,7 @@ Now we will create a Wordpress configuration file, download Wordpress using "wge
 
 Just as with phpMyAdmin, I will be using a [default Wordpress configuration file](https://github.com/WordPress/WordPress/blob/master/wp-config-sample.php).
 
-I will only modify the "DB_NAME", "DB_USER" and "DB_PASSWORD" fields to match our wodpress database values and leave the rest of it as it is.
+I will only modify the "DB_NAME", "DB_USER" and "DB_PASSWORD" fields to match our MySQL wordpress database values (defined in our "start,sh" file) and leave the rest of it as it is.
 
 Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php)" in our "srcs" folder.
 
@@ -604,7 +605,7 @@ RUN chmod -R 755 /var/www/*
 #-------------------------------------------------------------------------------------------------
 ```
 
-And this is it, our project is 100% ready
+And this is it, our project is 100% ready! 💯
 
 Now we have a fully functional ft_server project with NGINX, MySQL (MariaDB), phpMyAdmin, Wordpress and SSL protocol!
 
@@ -632,6 +633,20 @@ Since we changed the ownership and access rights of all the required files, the 
 ![](srcs/images/phpmyadmin_wp_full.png)
 
 You can check that the profile you created to access Wordpress is actually appearing in phpMyAdmin tables in "wordpress" -> "wp-users" section to make sure the link between the two is working properly.
+
+The only thing left to do is upload it and schedule your corrections 😉
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+# Thank you
+
+Congratulations on finishing the project and thank you for going through my tutorial 💪!
+
+If you have any questions, issues or feedback, you can contact me by [filing an issue here](https://github.com/Ysoroko/ft_server_tutorial/issues)
+
+If this tutorial helped you with your work, don't hesitate to "star ⭐" it on Github, it helps me a lot!
+
+Good luck with your future projects! 👋
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
