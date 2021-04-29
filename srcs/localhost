@@ -29,7 +29,7 @@ server {
     # Enables autoindex to redirect us to the choice between wordpress and phpMyAdmin
     autoindex on;
     # Tells the possible names of the index file
-    index index.html index.htm index.nginx-debian.html index.php;
+    index index.html index.htm index.php;
     # Tells to check for existence of files before moving on
 	location / {
 		try_files $uri $uri/ =404;
