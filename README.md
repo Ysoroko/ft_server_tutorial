@@ -31,7 +31,7 @@ You will often need to test your work. The following commands are used *A LOT* a
 #### 4) [Add SSL protocol and autoindex](#add-ssl-protocol-and-autoindex)
 #### 5) [Install and configure phpMyAdmin](#install-and-configure-phpmyadmin)
 #### 6) [Install and configure Wordpress](#install-and-configure-wordpress)
-#### 7) [Wrapping up](#autoindex-and-wrapping-up)
+#### 7) [The end](#the-end)
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Create a Dockerfile and download a Debian Buster image
@@ -372,6 +372,12 @@ sleep infinity
 Now that all of the commands we need to execute are ready and waiting in "[start.sh](./srcs/start.sh)" file, let's place it in our
 container and tell our Dockerfile to execute it when we run our container.
 
+`CMD` command defines the default command which will be ran when we start our container.
+
+There can only be one CMD per container but since we need to execute several commands when we start it up we just place all of them in our "start.sh" file.
+
+Another possibility would be to include all of them in our `CMD` by separating them with ';', but it would've been a hell of a line 😅
+
 ```Dockerfile
 #----------------------------------- 5. PHP MY ADMIN ---------------------------------------------
 # Move start.sh from our computer inside the container
@@ -638,7 +644,7 @@ The only thing left to do is upload it and schedule your corrections 😉
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
-# Thank you
+# The end
 
 Congratulations on finishing the project and thank you for going through my tutorial 💪!
 
