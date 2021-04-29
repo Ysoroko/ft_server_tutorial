@@ -23,18 +23,20 @@ echo "FLUSH PRIVILEGES;" | mysql -u root --skip-password;
 echo "update mysql.user set plugin='' where user='root';" | mysql -u root --skip-password;
 
 #------------------------------------------------------------------------------------------------------
-
 # Restart the nginx to apply the changes
 service nginx restart;
 
 # Restart php to apply the changes
 service php7.3-fpm restart;
 
-# At this point the commands will be executed once and that's it, we need to be able to keep our server
-# running. There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
+# At this point the commands will be executed once and the server will shut down.
+# We need to be able to keep our server running.
+# There are multiple ways to achieve this, but here I will use a kind of a lazy solution of
 # executing "sleep infinity" command which will simply keep our server running until we press CTRL+C
+# in the terminal
 sleep infinity
 
 # Please note that since "sleep infinity" is executed while running our container,
 # the "docker run" flags "-it" (= terminal mode with a "pretty" format) are not going to do anything anymore.
 # If you still want to run your container in terminal mode, you can remove the "sleep infinity" command
+# or simply replace "sleep infinity" with "bash" command

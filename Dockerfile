@@ -6,7 +6,7 @@
 #    By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/20 11:53:04 by ysoroko           #+#    #+#              #
-#    Updated: 2021/04/20 12:39:48 by ysoroko          ###   ########.fr        #
+#    Updated: 2021/04/29 18:04:30 by ysoroko          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ RUN apt-get upgrade -y
 #-------------------------------------------------------------------------------------------------
 
 #----------------------------------- 2. Intall Dependencies --------------------------------------
-# Sysvinit-utils for "service" command used to easily start and restart out nginx
+# Sysvinit-utils for "service" command used to easily start and restart our nginx/php/mysql
 RUN apt-get install sysvinit-utils
 
 # Wget is used to easily download phpMyAdmin / Wordpress
@@ -38,8 +38,10 @@ RUN apt-get -y install php-cgi php-common php-fpm php-pear php-mbstring
 RUN apt-get -y install php-zip php-net-socket php-gd php-xml-util php-gettext php-mysql php-bcmath
 #-------------------------------------------------------------------------------------------------
 
-#----------------------------------- 3. CONFIGURE NGINX  -----------------------------------------
+#---------------------------------- 3. Install and configure Nginx  ------------------------------
 # NGINX will need a folder where it will search for everything related to our website
+# We can use the "html" folder that already exists in var/www directory,
+# but it's a good practice to have a separate folder for every website in case we create more than 1
 RUN mkdir /var/www/localhost
 
 # COPY copies files from the given directory on our computer to given directory inside our container.
@@ -56,7 +58,24 @@ RUN ln -s /etc/nginx/sites-available/localhost /etc/nginx/sites-enabled
 WORKDIR /var/www/localhost/
 #-------------------------------------------------------------------------------------------------
 
-#----------------------------------- 4. PHP MY ADMIN ---------------------------------------------
+#------------------------------ 4. Add SSL protocol and autoindex --------------------------------
+# SSL creates a secured channel between the web browser and the web server
+#
+# "openssl" command allows us to create a certificate and key ourselves
+# here below is the explanation of the flags used:
+# -x509 specifies a self signed certificate
+# -nodes specifies that the private key wont be encrypted
+# -days specifies the validity (in days) of the certificate
+# -subj allows us to use the following string (and not create a separate file for it)
+# The next line is personnal information, you will need to use your own
+# -newkey creates a new certificate request and a new private key 
+# -rsa 2018 is the standard key size (in bits)
+# -keyout specifies where to save the key
+# -out specifies the file name
+RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
+#-------------------------------------------------------------------------------------------------
+
+#----------------------------------- 5. PHP MY ADMIN ---------------------------------------------
 # Move start.sh from our computer inside the container
 COPY ./srcs/start.sh ./
 
@@ -65,12 +84,14 @@ COPY ./srcs/start.sh ./
 CMD bash start.sh;
 
 # Download phpMyAdmin by using "wget" which we installed in step 2
+# At the time you do this you might need to download a different version from 5.1.0
+# Try to always use the latest version
 RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.1.0/phpMyAdmin-5.1.0-english.tar.gz
 
 # Extract the downloaded compressed files and remove the ".tar" file we no longer need
 RUN tar -xf phpMyAdmin-5.1.0-english.tar.gz && rm -rf phpMyAdmin-5.1.0-english.tar.gz
 
-# Move the extracted files in the "phpmyadmin" folder
+# Rename the downloaded folder by "phpmyadmin"
 RUN mv phpMyAdmin-5.1.0-english phpmyadmin
 
 # Copy the "config.inc.php" file we created to the same "phpmyadmin" folder
@@ -91,21 +112,4 @@ COPY ./srcs/wp-config.php /var/www/localhost/wordpress
 # This is required for phpMyAdmin to have acces to all the data, otherwise it will display an error
 RUN chown -R www-data:www-data *
 RUN chmod -R 755 /var/www/*
-#-------------------------------------------------------------------------------------------------
-
-#----------------------------- 6. Generate SSL certificate and key -------------------------------
-# SSL creates a secured channel between the web browser and the web server
-#
-# "openssl" command allows us to create a certificate and key ourselves
-# here below is the explanation of the flags used:
-# -x509 specifies a self signed certificate
-# -nodes specifies that the private key wont be encrypted
-# -days specifies the validity (in days) of the certificate
-# -subj allows us to use the following string (and not create a separate file for it)
-# The next line is personnal information, you will need to use your own
-# -newkey creates a new certificate request and a new private key 
-# -rsa 2018 is the standard key size (in bits)
-# -keyout specifies where to save the key
-# -out specifies the file name
-RUN openssl req -x509 -nodes -days 30 -subj "/C=BE/ST=Belgium/L=Brussels/O=42 Network/OU=s19/CN=ysoroko" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
 #-------------------------------------------------------------------------------------------------
