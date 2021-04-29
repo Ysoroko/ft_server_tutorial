@@ -16,6 +16,7 @@ You will often need to test your work. The following commands are used *A LOT* a
   * `--rm` automatically remove the container once it's stopped
   * `-p` link the necessary ports between the container and our computer (80 and 443)
   * And finally, name it "ft_server"
+  * Note: while on MacOS specifying the ports like this is enough, on other OS you might need to add EXPOSE 80 and EXPOSE 443 in your Dockerfile to make it work
  
 `docker rmi $(docker images -q)` will remove all the images
 
