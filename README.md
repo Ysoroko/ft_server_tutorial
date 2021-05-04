@@ -377,7 +377,7 @@ container and tell our Dockerfile to execute it when we run our container.
 
 There can only be one CMD per container but since we need to execute several commands when we start it up we just place all of them in our "start.sh" file.
 
-Another possibility would be to include all of them in our `CMD` by separating them with ';', but it would've been a hell of a line 😅
+Another possibility would be to include all of them in our `CMD` by separating them with `';'` but it would've been a hell of a line 😅
 
 ```Dockerfile
 #----------------------------------- 5. PHP MY ADMIN ---------------------------------------------
