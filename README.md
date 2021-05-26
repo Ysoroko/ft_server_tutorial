@@ -1,4 +1,5 @@
 ### This is a complete step-by-step tutorial to validate ft_server project (s42 network)
+### Update: in may 2021 ft_server project was removed from the main core.
 
 --------------------------------------------------------------------------------------------------------------------------------------
 # Prerequisites:
