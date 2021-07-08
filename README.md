@@ -505,7 +505,7 @@ Now we will create a Wordpress configuration file, download Wordpress using "wge
 
 Just as with phpMyAdmin, I will be using a [default Wordpress configuration file](https://github.com/WordPress/WordPress/blob/master/wp-config-sample.php).
 
-I will only modify the "DB_NAME", "DB_USER" and "DB_PASSWORD" fields to match our MySQL wordpress database values (defined in our "start,sh" file) and leave the rest of it as it is.
+I will only modify the "DB_NAME", "DB_USER" and "DB_PASSWORD" fields to match our MySQL wordpress database values (defined in our "start.sh" file) and leave the rest of it as it is.
 
 Let's start by creating a configuration file named "[wp-config.php](./srcs/wp-config.php)" in our "srcs" folder.
 
