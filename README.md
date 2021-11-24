@@ -1,4 +1,5 @@
 ### This is a complete step-by-step tutorial to validate ft_server project (s42 network)
+### The goal of the project is to learn to use Docker, phpMyAdmin, Wordpress and mySQL
 ### Update: in may 2021 ft_server project was removed from the main core.
 ### If you are interested in the project, you can find its subject [here](./srcs/images/ft_server_subject.pdf)
 
